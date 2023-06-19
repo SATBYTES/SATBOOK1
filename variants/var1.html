@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Encounter</title>
+  <link rel="icon" type="image/x-icon" href="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/logo.svg">
+  <style>
+    @keyframes fadein {
+      from {
+        top: 100%;
+      }
+
+      to {
+        top: calc(50% - 22vw);
+      }
+    }
+
+    .book {
+      transition: opacity 0.4s 0.2s;
+      position: absolute;
+      left: calc(50% - 30vw);
+      animation: fadein 2s;
+    }
+
+    .page {
+      width: 40vw;
+      height: 56vw;
+      background-color: #111111;
+      margin-bottom: 0.5em;
+      background: left top no-repeat;
+      background-size: cover;
+    }
+
+    .page img {
+      width: 100%;
+      height: 100%;
+    }
+
+    img.bordered {
+      border: 2px solid black;
+    }
+
+    .book {
+      perspective: 250vw;
+    }
+
+    .book .pages {
+      width: calc(60vw + 1px);
+      height: 44vw;
+      position: relative;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      border-radius: 4px;
+    }
+
+    .book .page {
+      margin: 0;
+      position: absolute;
+      top: 0;
+      width: 30vw;
+      height: 44vw;
+      transform-origin: 0 0;
+      transition: transform 1.4s;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      user-select: none;
+      background-size: 100%;
+      background-position: top left;
+    }
+
+    .book .page.brd {
+      width: 30vw;
+      height: 44vw;
+    }
+
+    .book .page>.bordered {
+      width: 100%;
+      height: 100%;
+      border: 1.3vw solid transparent;
+    }
+
+    .book .page:nth-child(odd) {
+      pointer-events: all;
+      transform: rotateY(0deg);
+      left: 50%;
+      border-radius: 0 4px 4px 0;
+      overflow: hidden;
+      background-image: linear-gradient(to right,
+          rgb(121, 121, 121) 0%,
+          rgb(200, 200, 200) 6%,
+          rgb(210, 210, 210) 17%,
+          rgb(216, 216, 216) 30%,
+          rgb(210, 210, 210) 70%,
+          rgb(195, 195, 195) 100%);
+    }
+
+    .book .page:nth-child(even) {
+      pointer-events: none;
+      transform: rotateY(180deg);
+      transform-origin: calc(100% + 1px) 0;
+      left: 0;
+      border-radius: 4px 0 0 4px;
+      overflow: hidden;
+      background-image: linear-gradient(to left,
+          rgb(121, 121, 121) 0%,
+          rgb(200, 200, 200) 6%,
+          rgb(210, 210, 210) 17%,
+          rgb(216, 216, 216) 30%,
+          rgb(210, 210, 210) 70%,
+          rgb(195, 195, 195) 100%);
+    }
+
+    .book .page.grabbing {
+      transition: none;
+    }
+
+    .book .page.flipped:nth-child(odd) {
+      pointer-events: none;
+      transform: rotateY(-180deg);
+    }
+
+    .book .page.flipped:nth-child(even) {
+      pointer-events: all;
+      transform: rotateY(0deg);
+    }
+
+    *,
+    * :before,
+    *:after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: "Lovers Quarrel", cursive;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      background: url('https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/Frame.webp') center no-repeat;
+      background-size: cover;
+      min-height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+    }
+
+    #shadow {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pageBtn {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      z-index: 20;
+    }
+
+    .next {
+      left: 50%;
+    }
+
+    .prev {
+      left: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="shadow">
+    <div class="book">
+      <div class="pageBtn prev"></div>
+      <div class="pageBtn next"></div>
+      <div id="pages" class="pages">
+        <div class="page">
+          <img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/CoverFront.webp" alt="" />
+        </div>
+        <div class="page">
+          <img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/0.webp" alt="" />
+        </div>
+        <div class="page brd">
+          <div class="bordered"><img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/1.webp" class="bordered" alt="" /></div>
+        </div>
+        <div class="page brd">
+          <div class="bordered"><img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/2.webp" class="bordered" alt="" /></div>
+        </div>
+        <div class="page brd">
+          <div class="bordered"><img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/3.webp" class="bordered" alt="" /></div>
+        </div>
+        <div class="page brd">
+          <div class="bordered"><img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/4.webp" class="bordered" alt="" /></div>
+        </div>
+        <div class="page brd">
+          <div class="bordered"><img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/5.webp" class="bordered" alt="" /></div>
+        </div>
+        <div class="page brd">
+          <div class="bordered"><img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/6.webp" class="bordered" alt="" /></div>
+        </div>
+        <div class="page">
+          <img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/7.webp" alt="" />
+        </div>
+        <div class="page">
+          <img src="https://gateway.pinata.cloud/ipfs/QmZ6hD1FZJsUUXtSBSiQ94ZjgZ7eHepEvkc8srbEn8cGkb/slides/CoverBack.webp" alt="" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let pages = document.getElementsByClassName("page");
+    let pagesContainer = document.getElementsByClassName("pages");
+    let nextPage = document.querySelector(".next");
+    let prevPage = document.querySelector(".prev");
+    let pageBtns = document.querySelector(".pageBtn");
+    let activePageIndex = 0;
+    let reverse = false;
+
+    const setCardsZIndex = () => {
+      for (let i = 0; i < pages.length; i++) {
+        if (i % 2 === 0) {
+          pages[i].style.zIndex = pages.length - i;
+        }
+      }
+    };
+
+    const checkCursor = () => {
+      (activePageIndex > 1 && activePageIndex < pages.length - 1) ? (
+        prevPage.style.cursor = "pointer",
+        nextPage.style.cursor = "pointer"
+      ) : (
+        activePageIndex === 0 ?
+          (
+            prevPage.style.cursor = "default",
+            nextPage.style.cursor = "pointer"
+          ) : (
+            prevPage.style.cursor = "pointer",
+            nextPage.style.cursor = "default"
+          )
+      )
+    }
+
+    const flipToNextPage = () => {
+      if (activePageIndex < pages.length - 1) {
+        pages[activePageIndex].classList.add("flipped");
+        pages[activePageIndex + 1].classList.add("flipped");
+        activePageIndex += 2;
+      }
+      activePageIndex === pages.length && (reverse = true);
+      checkCursor();
+    }
+
+    const flipToPrevPage = () => {
+      if (activePageIndex > 1) {
+        pages[activePageIndex - 2].classList.remove("flipped");
+        pages[activePageIndex - 1].classList.remove("flipped");
+        activePageIndex -= 2;
+      }
+      activePageIndex < 2 && (reverse = false);
+      checkCursor();
+    }
+
+    const returnToStart = () => {
+      let pagesTimer = setInterval(() => {
+        if (activePageIndex !== 0) {
+          flipToPrevPage();
+        } else {
+          clearInterval(pagesTimer);
+        }
+      }, 400);
+    }
+
+    const autoFlip = () => {
+      setInterval(() => {
+        if (activePageIndex === pages.length - 1 || reverse) {
+          returnToStart();
+        } else {
+          flipToNextPage();
+        }
+      }, 12000);
+    }
+
+    const App = () => {
+      setCardsZIndex();
+      checkCursor();
+      nextPage.onclick = () => flipToNextPage();
+      prevPage.onclick = () => flipToPrevPage();
+      autoFlip();
+    }
+
+    App();
+  </script>
+</body>
+
+</html>
